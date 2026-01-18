@@ -7,15 +7,21 @@
 using namespace std;
 
 struct Pomiar {
-    string czas;
+    string czas;        
     float autoKonsumpcja;
     float eksportEnergii;
     float importEnergii;
     float pobor;
     float produkcja;
+    Pomiar(string t, float a, float e, float i, float c, float p)
+        : czas(t), autoKonsumpcja(a), eksportEnergii(e), importEnergii(i), pobor(c), produkcja(p) {
+    }
 
-    Pomiar(string t = "", float a = 0, float e = 0, float i = 0, float c = 0, float p = 0)
-        : czas(t), autoKonsumpcja(a), eksportEnergii(e), importEnergii(i), pobor(c), produkcja(p) {}
+    void wypisz() const {
+        cout << "   [Pomiar] Czas: " << czas
+            << " | Import: " << importEnergii
+            << " | Pobor: " << pobor << endl;
+    }
 };
 
-#endif
+#endif#pragma once

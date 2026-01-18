@@ -1,20 +1,27 @@
-﻿// Analizator-Danych-Energetycznych.cpp : Ten plik zawiera funkcję „main”. W nim rozpoczyna się i kończy wykonywanie programu.
-//
+﻿#include <iostream>
+#include <memory>
+#include "include/Pomiar.h"
+#include "include/Drzewo.h"
 
-#include <iostream>
+using namespace std;
 
-int main()
-{
-    std::cout << "Hello World!\n";
+int main() {
+    cout << "Testowanie struktury drzewiastej..." << endl;
+
+    // 1. Inicjalizacja bazy
+    BazaDanych db;
+    // Dane
+    auto p1 = make_shared<Pomiar>("01.10.2020 0:00", 0, 0, 406.8, 406.8, 0);
+    auto p2 = make_shared<Pomiar>("01.10.2020 0:15", 0, 0, 403.5, 403.5, 0);
+    auto p3 = make_shared<Pomiar>("15.05.2021 12:00", 50, 100, 0, 200, 300);
+
+    cout << "Dodaje dane..." << endl;
+    db.dodajDane(2020, 10, 1, p1);
+    db.dodajDane(2020, 10, 1, p2);
+    db.dodajDane(2021, 5, 15, p3); 
+    db.wypiszStrukture();
+    cout << "Szczegoly pierwszego pomiaru:" << endl;
+    p1->wypisz();
+
+    return 0;
 }
-
-// Uruchomienie programu: Ctrl + F5 lub menu Debugowanie > Uruchom bez debugowania
-// Debugowanie programu: F5 lub menu Debugowanie > Rozpocznij debugowanie
-
-// Porady dotyczące rozpoczynania pracy:
-//   1. Użyj okna Eksploratora rozwiązań, aby dodać pliki i zarządzać nimi
-//   2. Użyj okna programu Team Explorer, aby nawiązać połączenie z kontrolą źródła
-//   3. Użyj okna Dane wyjściowe, aby sprawdzić dane wyjściowe kompilacji i inne komunikaty
-//   4. Użyj okna Lista błędów, aby zobaczyć błędy
-//   5. Wybierz pozycję Projekt > Dodaj nowy element, aby utworzyć nowe pliki kodu, lub wybierz pozycję Projekt > Dodaj istniejący element, aby dodać istniejące pliku kodu do projektu
-//   6. Aby w przyszłości ponownie otworzyć ten projekt, przejdź do pozycji Plik > Otwórz > Projekt i wybierz plik sln
