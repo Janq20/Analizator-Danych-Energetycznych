@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include "include/Narzedzia.h"
-#include "include/Drzewo.h"
-#include "include/Pomiar.h"
-#include "include/Analizator.h"
+#include "Narzedzia.h"
+#include "Drzewo.h"
+#include "Pomiar.h"
+#include "Analizator.h"
 
 // --- CZESC 1: NARZEDZIA ---
 
