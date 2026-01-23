@@ -4,22 +4,24 @@
 #include <map>
 #include <vector>
 #include <memory>
-#include <algorithm> 
+#include <algorithm>
+#include <string>
 #include "Pomiar.h"
 
 using namespace std;
 
-// --- 1. Nowa klasa: Æwiartka (6 godzin) ---
 class Cwiartka {
 public:
     vector<shared_ptr<Pomiar>> pomiary;
 
     void dodajPomiar(shared_ptr<Pomiar> p) {
         pomiary.push_back(p);
+        sort(pomiary.begin(), pomiary.end(), [](const shared_ptr<Pomiar>& a, const shared_ptr<Pomiar>& b) {
+            return a->czas < b->czas;
+            });
     }
 };
 
-// --- 2. Aktualizacja: Dzieñ ma teraz Æwiartki, a nie Pomiary ---
 class Dzien {
 public:
     map<int, shared_ptr<Cwiartka>> cwiartki;
@@ -32,7 +34,6 @@ public:
     }
 };
 
-// --- Miesi¹c (bez zmian) ---
 class Miesiac {
 public:
     map<int, shared_ptr<Dzien>> dni;
@@ -45,7 +46,6 @@ public:
     }
 };
 
-// --- Rok (bez zmian) ---
 class Rok {
 public:
     map<int, shared_ptr<Miesiac>> miesiace;
@@ -58,17 +58,32 @@ public:
     }
 };
 
-// --- Baza Danych ---
 class BazaDanych {
 public:
     map<int, shared_ptr<Rok>> lata;
+
+    int wyznaczIndeksCwiartki(string czas) {
+        size_t spacja = czas.find(' ');
+        if (spacja == string::npos) return 0;
+
+        string godzinaStr = czas.substr(spacja + 1);
+        int godzina = stoi(godzinaStr.substr(0, godzinaStr.find(':')));
+
+        if (godzina < 6) return 0;
+        if (godzina < 12) return 1;
+        if (godzina < 18) return 2;
+        return 3;
+    }
 
     void dodajDane(int r, int m, int d, shared_ptr<Pomiar> p) {
         if (lata.find(r) == lata.end()) {
             lata[r] = make_shared<Rok>();
         }
-        lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(0)->dodajPomiar(p);
+
+        int idx = wyznaczIndeksCwiartki(p->czas);
+        lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx)->dodajPomiar(p);
     }
+
     void wypiszStrukture() {
     }
 };
