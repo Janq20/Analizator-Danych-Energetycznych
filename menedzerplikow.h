@@ -23,9 +23,23 @@ public:
             return;
         }
 
-        cout << "Plik otwarty pomyslnie: " << nazwaPliku << endl;
+        string linia;
+        int licznikLinii = 0;
+
+        cout << "Rozpoczynam czytanie linii..." << endl;
+
+        while (getline(plik, linia)) {
+            licznikLinii++;
+
+            // Wymóg: Pierwsza linia to nag³ówek 
+            if (licznikLinii == 1) continue;
+
+            // Zabezpieczenie przed pustymi liniami na koñcu pliku
+            if (linia.empty()) continue;
+        }
 
         plik.close();
+        cout << "Koniec czytania. Przetworzono linii: " << licznikLinii << endl;
     }
 };
 
