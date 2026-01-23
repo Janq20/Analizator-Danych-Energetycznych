@@ -1,27 +1,27 @@
 ﻿#include <iostream>
-#include <memory>
 #include "include/Pomiar.h"
 #include "include/Drzewo.h"
+#include "include/Narzedzia.h"
+#include "include/MenedzerPlikow.h"
+#include "include/Analizator.h"
 
 using namespace std;
 
 int main() {
-    cout << "Testowanie struktury drzewiastej..." << endl;
-
-    // 1. Inicjalizacja bazy
+    // 1. Inicjalizacja Bazy Danych
     BazaDanych db;
-    // Dane
-    auto p1 = make_shared<Pomiar>("01.10.2020 0:00", 0, 0, 406.8, 406.8, 0);
-    auto p2 = make_shared<Pomiar>("01.10.2020 0:15", 0, 0, 403.5, 403.5, 0);
-    auto p3 = make_shared<Pomiar>("15.05.2021 12:00", 50, 100, 0, 200, 300);
 
-    cout << "Dodaje dane..." << endl;
-    db.dodajDane(2020, 10, 1, p1);
-    db.dodajDane(2020, 10, 1, p2);
-    db.dodajDane(2021, 5, 15, p3); 
-    db.wypiszStrukture();
-    cout << "Szczegoly pierwszego pomiaru:" << endl;
-    p1->wypisz();
+    // 2. Inicjalizacja Menedżera Plików i Analizatora
+    MenedzerPlikow menedzer;
+    Analizator analizator(db);
 
+    cout << "Witaj w Analizatorze Danych Energetycznych!" << endl;
+    string nazwaPliku = "dane.csv";
+
+    cout << "Proba wczytania pliku: " << nazwaPliku << endl;
+    menedzer.wczytajPlik(nazwaPliku, db);
+    analizator.wypiszStatystyki();
+
+    cout << "\nKoniec programu." << endl;
     return 0;
 }
