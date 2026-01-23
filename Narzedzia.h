@@ -32,19 +32,32 @@ public:
         try { return stof(tekst); }
         catch (...) { return 0.0f; }
     }
+
     static DataCzas parsujDate(string surowaData) {
+        surowaData.erase(remove(surowaData.begin(), surowaData.end(), '\"'), surowaData.end());
+
         auto czesci = rozdzielTekst(surowaData, ' ');
         if (czesci.size() < 2) return { 2000, 1, 1, "00:00" };
 
-        string dataStr = czesci[0]; 
-        string godzStr = czesci[1]; 
-        auto dataLiczby = rozdzielTekst(dataStr, '.');
+        string dataStr = czesci[0];
+        string godzStr = czesci[1];
+
+        char separator = (dataStr.find('.') != string::npos) ? '.' : '-';
+        auto dataLiczby = rozdzielTekst(dataStr, separator);
+
         if (dataLiczby.size() < 3) return { 2000, 1, 1, "00:00" };
 
         DataCzas wynik;
-        wynik.dzien = stoi(dataLiczby[0]);
-        wynik.miesiac = stoi(dataLiczby[1]);
-        wynik.rok = stoi(dataLiczby[2]);
+        if (separator == '-') {
+            wynik.rok = stoi(dataLiczby[0]);
+            wynik.miesiac = stoi(dataLiczby[1]);
+            wynik.dzien = stoi(dataLiczby[2]);
+        }
+        else {
+            wynik.dzien = stoi(dataLiczby[0]);
+            wynik.miesiac = stoi(dataLiczby[1]);
+            wynik.rok = stoi(dataLiczby[2]);
+        }
         wynik.godzina = godzStr;
 
         return wynik;
