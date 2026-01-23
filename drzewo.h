@@ -84,6 +84,21 @@ public:
         lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx)->dodajPomiar(p);
     }
 
+    // Nowa metoda dla Iteratora: Sp³aszcza drzewo do jednego wektora
+    vector<shared_ptr<Pomiar>> pobierzWszystkiePomiary() {
+        vector<shared_ptr<Pomiar>> wynik;
+        for (auto const& [r, objRok] : lata) {
+            for (auto const& [m, objMiesiac] : objRok->miesiace) {
+                for (auto const& [d, objDzien] : objMiesiac->dni) {
+                    for (auto const& [c, objCwiartka] : objDzien->cwiartki) {
+                        wynik.insert(wynik.end(), objCwiartka->pomiary.begin(), objCwiartka->pomiary.end());
+                    }
+                }
+            }
+        }
+        return wynik;
+    }
+
     void wypiszStrukture() {
     }
 };
