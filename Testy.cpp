@@ -56,3 +56,36 @@ TEST(DrzewoTest, StrukturaHierarchii) {
     auto dzien = db.lata[2021]->wezMiesiac(1)->wezDzien(1);
     EXPECT_FALSE(dzien->cwiartki.empty());
 }
+// --- CZESC 3: ANALIZA I ITERATOR ---
+
+TEST(IteratorTest, IteracjaPodstawowa) {
+    BazaDanych db;
+    auto p1 = make_shared<Pomiar>("Czas1", 1, 1, 1, 1, 1);
+    db.dodajDane(2021, 1, 1, p1);
+
+    Iterator it(db);
+    EXPECT_FALSE(it.czyKoniec());
+    it.nastepny();
+    EXPECT_TRUE(it.czyKoniec());
+}
+
+TEST(AnalizatorTest, SumowanieAutokonsumpcji) {
+    BazaDanych db;
+    auto p1 = make_shared<Pomiar>("t1", 100, 0, 0, 0, 0);
+    auto p2 = make_shared<Pomiar>("t2", 50, 0, 0, 0, 0);
+    db.dodajDane(2021, 1, 1, p1);
+    db.dodajDane(2021, 1, 1, p2);
+
+    Analizator analizator(db);
+    float suma = analizator.obliczSume([](auto p) { return p->autoKonsumpcja; });
+
+    EXPECT_FLOAT_EQ(suma, 150.0f);
+}
+
+TEST(AnalizatorTest, SumowaniePustejBazy) {
+    BazaDanych db;
+    Analizator analizator(db);
+    float suma = analizator.obliczSume([](auto p) { return p->produkcja; });
+
+    EXPECT_FLOAT_EQ(suma, 0.0f);
+}
