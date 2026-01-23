@@ -1,4 +1,6 @@
 ﻿#include <iostream>
+#include <string>
+#include <limits> // Do czyszczenia bufora wejścia
 #include "include/Pomiar.h"
 #include "include/Drzewo.h"
 #include "include/Narzedzia.h"
@@ -7,21 +9,58 @@
 
 using namespace std;
 
-int main() {
-    // 1. Inicjalizacja Bazy Danych
-    BazaDanych db;
+void wyswietlMenu() {
+    cout << "\n==========================================" << endl;
+    cout << "   ANALIZATOR DANYCH ENERGETYCZNYCH v1.0" << endl;
+    cout << "==========================================" << endl;
+    cout << "1. Wczytaj dane z pliku CSV" << endl;
+    cout << "2. Wykonaj analize danych (Sumy)" << endl;
+    cout << "3. Zapisz dane do pliku binarnego (TODO)" << endl;
+    cout << "4. Wczytaj dane z pliku binarnego (TODO)" << endl;
+    cout << "5. Wyjscie" << endl;
+    cout << "------------------------------------------" << endl;
+    cout << "Wybierz opcje: ";
+}
 
-    // 2. Inicjalizacja Menedżera Plików i Analizatora
+int main() {
+    BazaDanych db;
     MenedzerPlikow menedzer;
     Analizator analizator(db);
 
-    cout << "Witaj w Analizatorze Danych Energetycznych!" << endl;
-    string nazwaPliku = "dane.csv";
+    int wybor = 0;
+    string nazwaPliku;
 
-    cout << "Proba wczytania pliku: " << nazwaPliku << endl;
-    menedzer.wczytajPlik(nazwaPliku, db);
-    analizator.wypiszStatystyki();
+    while (true) {
+        wyswietlMenu();
+        if (!(cin >> wybor)) {
+            cout << "To nie jest liczba!" << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
 
-    cout << "\nKoniec programu." << endl;
+        switch (wybor) {
+        case 1:
+            cout << "Podaj nazwe pliku (np. zadanie6.csv): ";
+            cin >> nazwaPliku;
+            menedzer.wczytajPlik(nazwaPliku, db);
+            break;
+        case 2:
+            analizator.wypiszStatystyki();
+            break;
+        case 3:
+            cout << "[INFO] Funkcja zapisu binarnego bedzie w nastepnym commicie." << endl;
+            break;
+        case 4:
+            cout << "[INFO] Funkcja odczytu binarnego bedzie w nastepnym commicie." << endl;
+            break;
+        case 5:
+            cout << "Zamykanie programu..." << endl;
+            return 0;
+        default:
+            cout << "Nieznana opcja. Sprobuj ponownie." << endl;
+        }
+    }
+
     return 0;
 }
