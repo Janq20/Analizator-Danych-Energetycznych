@@ -1,0 +1,26 @@
+﻿  pch.cpp
+  test.cpp
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility(522,82): warning C4244: "argument": konwersja z "_Ty" do "float", możliwa utrata danych
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility(522,82): warning C4244:         with
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility(522,82): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility(522,82): warning C4244:             _Ty=int
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility(522,82): warning C4244:         ]
+  (compiling source file '/test.cpp')
+      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility(522,82):
+      kontekst tworzenia wystąpienia szablonu (najpierw najstarszy) to
+          C:\Users\Janek\source\repos\Analizator-Danych-Energetycznych\TestyGoogle\test.cpp(73,24):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „std::shared_ptr<Pomiar> std::make_shared<Pomiar,const char(&)[17],int,int,int,int,int>(const char (&)[17],int &&,int &&,int &&,int &&,int &&)” funkcji szablon
+          C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\memory(2944,46):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „std::_Ref_count_obj2<_Ty>::_Ref_count_obj2<const char(&)[17],int,int,int,int,int>(const char (&)[17],int &&,int &&,int &&,int &&,int &&)” funkcji szablon
+          with
+          [
+              _Ty=Pomiar
+          ]
+          C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\memory(2131,18):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „void std::_Construct_in_place<_Ty,const char(&)[17],int,int,int,int,int>(_Ty &,const char (&)[17],int &&,int &&,int &&,int &&,int &&) noexcept(false)” funkcji szablon
+          with
+          [
+              _Ty=Pomiar
+          ]
+  
+  TestyGoogle.vcxproj -> C:\Users\Janek\source\repos\Analizator-Danych-Energetycznych\x64\Debug\TestyGoogle.exe
