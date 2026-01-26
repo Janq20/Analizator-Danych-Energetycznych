@@ -85,7 +85,7 @@ public:
         lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx)->dodajPomiar(p);
     }
 
-    // Metoda pomocnicza dla Iteratora: SpÅ‚aszcza caÅ‚e drzewo do wektora
+    // Metoda pomocnicza dla Iteratora: Sp³aszcza ca³e drzewo do wektora
     vector<shared_ptr<Pomiar>> pobierzWszystkiePomiary() {
         vector<shared_ptr<Pomiar>> wynik;
         for (auto const& [r, objRok] : lata) {
@@ -104,102 +104,37 @@ public:
     }
 };
 
-#endif
-void dodajDane(int r, int m, int d, shared_ptr<Pomiar> p) {
-    if (lata.find(r) == lata.end()) {
-        lata[r] = make_shared<Rok>();
-    }
-
-    int idx = wyznaczIndeksCwiartki(p->czas);
-    auto cwiartka = lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx);
-
-    // --- LOGIKA ANTY-DUPLIKATOWA (zgodnie z wymogiem s. 2 pkt 31) ---
-    for (const auto& istniejacy : cwiartka->pomiary) {
-        if (istniejacy->czas == p->czas) {
-            // Rzucamy wyjÃ„â€¦tek, ktÄ‚Å‚ry zostanie zalogowany w MenedzerPlikow
-            throw runtime_error("Wykryto duplikat - pomijanie rekordu: " + p->czas); 
-        }
-    }
-
-    cwiartka->dodajPomiar(p);
-}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzÄ…cego po wÄ™zÅ‚ach drzewa)
+// --- Nowoœæ: Klasa Iterator ---
 class Iterator {
 private:
-    BazaDanych& baza;
-    map<int, shared_ptr<Rok>>::iterator itRok;
-    map<int, shared_ptr<Miesiac>>::iterator itMiesiac;
-    map<int, shared_ptr<Dzien>>::iterator itDzien;
-    map<int, shared_ptr<Cwiartka>>::iterator itCwiartka;
-    size_t indexPomiar;
-
-    void ustawNaPoczatek() {
-        itRok = baza.lata.begin();
-        if (itRok != baza.lata.end()) {
-            itMiesiac = itRok->second->miesiace.begin();
-            if (itMiesiac != itRok->second->miesiace.end()) {
-                itDzien = itMiesiac->second->dni.begin();
-                if (itDzien != itMiesiac->second->dni.end()) {
-                    itCwiartka = itDzien->second->cwiartki.begin();
-                    indexPomiar = 0;
-                    pominPuste();
-                }
-            }
-        }
-    }
-
-    void pominPuste() {
-        while (itRok != baza.lata.end()) {
-            if (itMiesiac == itRok->second->miesiace.end()) {
-                itRok++;
-                if (itRok != baza.lata.end()) itMiesiac = itRok->second->miesiace.begin();
-                continue;
-            }
-            if (itDzien == itMiesiac->second->dni.end()) {
-                itMiesiac++;
-                if (itMiesiac != itRok->second->miesiace.end()) itDzien = itMiesiac->second->dni.begin();
-                continue;
-            }
-            if (itCwiartka == itDzien->second->cwiartki.end()) {
-                itDzien++;
-                if (itDzien != itMiesiac->second->dni.end()) itCwiartka = itDzien->second->cwiartki.begin();
-                continue;
-            }
-            if (indexPomiar >= itCwiartka->second->pomiary.size()) {
-                itCwiartka++;
-                indexPomiar = 0;
-                continue;
-            }
-            break;
-        }
-    }
+    vector<shared_ptr<Pomiar>> dane;
+    size_t index;
 
 public:
-    Iterator(BazaDanych& db) : baza(db) {
-        ustawNaPoczatek();
+    // Konstruktor: pobiera dane z bazy i ustawia siê na pocz¹tku
+    Iterator(BazaDanych& db) {
+        dane = db.pobierzWszystkiePomiary();
+        index = 0;
     }
-
     bool czyKoniec() {
-        return itRok == baza.lata.end();
+        return index >= dane.size();
     }
 
-    void nastepny() {
-        if (czyKoniec()) return;
-        indexPomiar++;
-        pominPuste();
-    }
-
+    // Zwraca wskaŸnik na obecny pomiar
     shared_ptr<Pomiar> obecny() {
         if (czyKoniec()) return nullptr;
-        return itCwiartka->second->pomiary[indexPomiar];
+        return dane[index];
     }
-<<<<<<< HEAD
+
+    // Przesuwa iterator o jeden do przodu
+    void nastepny() {
+        index++;
+    }
+
+    // Resetuje iterator na pocz¹tek
+    void naPoczatek() {
+        index = 0;
+    }
 };
->>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzÄ…cego po wÄ™zÅ‚ach drzewa)
-=======
-};
->>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzÄ…cego po wÄ™zÅ‚ach drzewa)
+
+#endif
