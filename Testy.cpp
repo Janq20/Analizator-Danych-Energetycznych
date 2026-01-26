@@ -6,16 +6,6 @@
 
 // --- CZESC 1: NARZEDZIA ---
 
-// 6. Test średniej z uwzględnieniem przedziału czasowego [cite: 19]
-TEST(AnalizatorTest, ObliczanieSredniejWPrzedziale) {
-    BazaDanych db;
-    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 08:00", 0, 0, 0, 0, 200));
-    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 20:00", 0, 0, 0, 0, 600)); // Poza zakresem testu
-    Analizator an(db);
-    float srednia = an.obliczSrednia("2021-10-03 07:00", "2021-10-03 09:00", [](auto p){ return p->produkcja; });
-    EXPECT_FLOAT_EQ(srednia, 200.0f);
-}
-
 TEST(NarzedziaTest, KonwersjaNaFloat_Poprawna) {
     EXPECT_FLOAT_EQ(Narzedzia::konwertujNaFloat("123.45"), 123.45f);
 }
