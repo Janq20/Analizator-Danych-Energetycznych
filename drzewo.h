@@ -85,7 +85,7 @@ public:
         lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx)->dodajPomiar(p);
     }
 
-    // Metoda pomocnicza dla Iteratora: Sp≥aszcza ca≥e drzewo do wektora
+    // Metoda pomocnicza dla Iteratora: Sp≈Çaszcza ca≈Çe drzewo do wektora
     vector<shared_ptr<Pomiar>> pobierzWszystkiePomiary() {
         vector<shared_ptr<Pomiar>> wynik;
         for (auto const& [r, objRok] : lata) {
@@ -104,37 +104,22 @@ public:
     }
 };
 
-// --- NowoúÊ: Klasa Iterator ---
-class Iterator {
-private:
-    vector<shared_ptr<Pomiar>> dane;
-    size_t index;
-
-public:
-    // Konstruktor: pobiera dane z bazy i ustawia siÍ na poczπtku
-    Iterator(BazaDanych& db) {
-        dane = db.pobierzWszystkiePomiary();
-        index = 0;
-    }
-    bool czyKoniec() {
-        return index >= dane.size();
-    }
-
-    // Zwraca wskaünik na obecny pomiar
-    shared_ptr<Pomiar> obecny() {
-        if (czyKoniec()) return nullptr;
-        return dane[index];
-    }
-
-    // Przesuwa iterator o jeden do przodu
-    void nastepny() {
-        index++;
-    }
-
-    // Resetuje iterator na poczπtek
-    void naPoczatek() {
-        index = 0;
-    }
-};
-
 #endif
+void dodajDane(int r, int m, int d, shared_ptr<Pomiar> p) {
+    if (lata.find(r) == lata.end()) {
+        lata[r] = make_shared<Rok>();
+    }
+
+    int idx = wyznaczIndeksCwiartki(p->czas);
+    auto cwiartka = lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx);
+
+    // --- LOGIKA ANTY-DUPLIKATOWA (zgodnie z wymogiem s. 2 pkt 31) ---
+    for (const auto& istniejacy : cwiartka->pomiary) {
+        if (istniejacy->czas == p->czas) {
+            // Rzucamy wyj√Ñ‚Ä¶tek, ktƒÇ≈Çry zostanie zalogowany w MenedzerPlikow
+            throw runtime_error("Wykryto duplikat - pomijanie rekordu: " + p->czas); 
+        }
+    }
+
+    cwiartka->dodajPomiar(p);
+}
