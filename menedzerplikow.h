@@ -33,3 +33,14 @@ public:
         }
     }
 };
+void wczytajBinarnie(const string& nazwaPliku, BazaDanych& db) {
+    ifstream plik(nazwaPliku, ios::binary);
+    if (!plik.is_open()) {
+        logger.loguj("Blad odczytu pliku binarnego: " + nazwaPliku, true);
+        return;
+    }
+
+    db.wyczysc(); // Wymóg: odczyt do pustego programu 
+    // ... reszta kodu wczytywania, który już masz ...
+    logger.loguj("Odczytano dane z pliku binarnego.");
+}
