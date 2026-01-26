@@ -1,3 +1,11 @@
+/**
+ * @file Drzewo.h
+ * @brief Hierarchiczna struktura danych oraz iterator do nawigacji po pomiarach.
+ *
+ * Plik zawiera definicje klas tworzących drzewiastą strukturę bazy danych:
+ * Rok -> Miesiąc -> Dzień -> Ćwiartka dnia -> Pomiary.
+ */
+
 #ifndef DRZEWO_H
 #define DRZEWO_H
 
@@ -11,10 +19,21 @@
 using namespace std;
 
 // --- Struktura Drzewa ---
+
+/**
+ * @class Cwiartka
+ * @brief Reprezentuje część dnia (okres 6-godzinny).
+ *
+ * Przechowuje wektor wskaźników na pomiary z danego okresu.
+ */
 class Cwiartka {
 public:
-    vector<shared_ptr<Pomiar>> pomiary;
+    vector<shared_ptr<Pomiar>> pomiary; ///< Lista pomiarów w danej ćwiartce.
 
+    /**
+     * @brief Dodaje nowy pomiar do ćwiartki i sortuje listę chronologicznie.
+     * @param p Wskaźnik na dodawany pomiar.
+     */
     void dodajPomiar(shared_ptr<Pomiar> p) {
         pomiary.push_back(p);
         sort(pomiary.begin(), pomiary.end(), [](const shared_ptr<Pomiar>& a, const shared_ptr<Pomiar>& b) {
@@ -23,10 +42,21 @@ public:
     }
 };
 
+/**
+ * @class Dzien
+ * @brief Reprezentuje pojedynczy dzień.
+ *
+ * Zawiera mapę ćwiartek dnia (kluczem jest indeks ćwiartki 0-3).
+ */
 class Dzien {
 public:
-    map<int, shared_ptr<Cwiartka>> cwiartki;
+    map<int, shared_ptr<Cwiartka>> cwiartki; ///< Mapa ćwiartek dnia.
 
+    /**
+     * @brief Zwraca wskaźnik na ćwiartkę o podanym numerze. Tworzy nową, jeśli nie istnieje.
+     * @param numerCwiartki Indeks ćwiartki (0-3).
+     * @return shared_ptr<Cwiartka> Wskaźnik na obiekt Ćwiartki.
+     */
     shared_ptr<Cwiartka> wezCwiartke(int numerCwiartki) {
         if (cwiartki.find(numerCwiartki) == cwiartki.end()) {
             cwiartki[numerCwiartki] = make_shared<Cwiartka>();
@@ -35,10 +65,21 @@ public:
     }
 };
 
+/**
+ * @class Miesiac
+ * @brief Reprezentuje miesiąc w roku.
+ *
+ * Zawiera mapę dni (kluczem jest numer dnia).
+ */
 class Miesiac {
 public:
-    map<int, shared_ptr<Dzien>> dni;
+    map<int, shared_ptr<Dzien>> dni; ///< Mapa dni w miesiącu.
 
+    /**
+     * @brief Zwraca wskaźnik na dzień. Tworzy nowy, jeśli nie istnieje.
+     * @param numerDnia Numer dnia (1-31).
+     * @return shared_ptr<Dzien> Wskaźnik na obiekt Dnia.
+     */
     shared_ptr<Dzien> wezDzien(int numerDnia) {
         if (dni.find(numerDnia) == dni.end()) {
             dni[numerDnia] = make_shared<Dzien>();
@@ -47,10 +88,21 @@ public:
     }
 };
 
+/**
+ * @class Rok
+ * @brief Reprezentuje rok kalendarzowy.
+ *
+ * Zawiera mapę miesięcy (kluczem jest numer miesiąca).
+ */
 class Rok {
 public:
-    map<int, shared_ptr<Miesiac>> miesiace;
+    map<int, shared_ptr<Miesiac>> miesiace; ///< Mapa miesięcy w roku.
 
+    /**
+     * @brief Zwraca wskaźnik na miesiąc. Tworzy nowy, jeśli nie istnieje.
+     * @param numerMiesiaca Numer miesiąca (1-12).
+     * @return shared_ptr<Miesiac> Wskaźnik na obiekt Miesiąca.
+     */
     shared_ptr<Miesiac> wezMiesiac(int numerMiesiaca) {
         if (miesiace.find(numerMiesiaca) == miesiace.end()) {
             miesiace[numerMiesiaca] = make_shared<Miesiac>();
@@ -59,10 +111,27 @@ public:
     }
 };
 
+/**
+ * @class BazaDanych
+ * @brief Główna klasa przechowująca całą strukturę danych pomiarowych.
+ *
+ * Struktura oparta jest na mapach zagnieżdżonych: Lata -> Miesiące -> Dni -> Ćwiartki.
+ */
 class BazaDanych {
 public:
-    map<int, shared_ptr<Rok>> lata;
+    map<int, shared_ptr<Rok>> lata; ///< Mapa lat dostępnych w bazie.
 
+    /**
+     * @brief Wyznacza indeks ćwiartki dnia na podstawie godziny w stringu.
+     *
+     * - 00:00 - 05:59 -> Ćwiartka 0
+     * - 06:00 - 11:59 -> Ćwiartka 1
+     * - 12:00 - 17:59 -> Ćwiartka 2
+     * - 18:00 - 23:59 -> Ćwiartka 3
+     *
+     * @param czas Czas w formacie "YYYY-MM-DD HH:MM".
+     * @return int Indeks ćwiartki (0-3).
+     */
     int wyznaczIndeksCwiartki(string czas) {
         size_t spacja = czas.find(' ');
         if (spacja == string::npos) return 0;
@@ -76,6 +145,16 @@ public:
         return 3;
     }
 
+    /**
+     * @brief Dodaje pomiar do struktury drzewiastej.
+     *
+     * Metoda automatycznie tworzy brakujące węzły (lata, miesiące, dni).
+     *
+     * @param r Rok.
+     * @param m Miesiąc.
+     * @param d Dzień.
+     * @param p Wskaźnik na obiekt Pomiaru.
+     */
     void dodajDane(int r, int m, int d, shared_ptr<Pomiar> p) {
         if (lata.find(r) == lata.end()) {
             lata[r] = make_shared<Rok>();
@@ -85,7 +164,12 @@ public:
         lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx)->dodajPomiar(p);
     }
 
-    // Metoda pomocnicza dla Iteratora: Spłaszcza całe drzewo do wektora
+    /**
+     * @brief Spłaszcza całą strukturę drzewa do jednego wektora pomiarów.
+     *
+     * Metoda pomocnicza używana głównie przez Iterator.
+     * @return vector<shared_ptr<Pomiar>> Wektor wszystkich pomiarów w bazie.
+     */
     vector<shared_ptr<Pomiar>> pobierzWszystkiePomiary() {
         vector<shared_ptr<Pomiar>> wynik;
         for (auto const& [r, objRok] : lata) {
@@ -100,109 +184,69 @@ public:
         return wynik;
     }
 
+    /**
+     * @brief Metoda placeholder do wypisywania struktury (obecnie pusta).
+     */
     void wypiszStrukture() {
     }
 };
 
-#endif
-void dodajDane(int r, int m, int d, shared_ptr<Pomiar> p) {
-    if (lata.find(r) == lata.end()) {
-        lata[r] = make_shared<Rok>();
-    }
+// --- Nowość: Klasa Iterator ---
 
-    int idx = wyznaczIndeksCwiartki(p->czas);
-    auto cwiartka = lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx);
-
-    // --- LOGIKA ANTY-DUPLIKATOWA (zgodnie z wymogiem s. 2 pkt 31) ---
-    for (const auto& istniejacy : cwiartka->pomiary) {
-        if (istniejacy->czas == p->czas) {
-            // Rzucamy wyjÄ…tek, ktĂłry zostanie zalogowany w MenedzerPlikow
-            throw runtime_error("Wykryto duplikat - pomijanie rekordu: " + p->czas); 
-        }
-    }
-
-    cwiartka->dodajPomiar(p);
-}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)
+/**
+ * @class Iterator
+ * @brief Umożliwia liniowe przechodzenie po wszystkich elementach bazy danych.
+ *
+ * Wzorzec projektowy Iterator. Ukrywa złożoność struktury drzewiastej przed użytkownikiem.
+ */
 class Iterator {
 private:
-    BazaDanych& baza;
-    map<int, shared_ptr<Rok>>::iterator itRok;
-    map<int, shared_ptr<Miesiac>>::iterator itMiesiac;
-    map<int, shared_ptr<Dzien>>::iterator itDzien;
-    map<int, shared_ptr<Cwiartka>>::iterator itCwiartka;
-    size_t indexPomiar;
-
-    void ustawNaPoczatek() {
-        itRok = baza.lata.begin();
-        if (itRok != baza.lata.end()) {
-            itMiesiac = itRok->second->miesiace.begin();
-            if (itMiesiac != itRok->second->miesiace.end()) {
-                itDzien = itMiesiac->second->dni.begin();
-                if (itDzien != itMiesiac->second->dni.end()) {
-                    itCwiartka = itDzien->second->cwiartki.begin();
-                    indexPomiar = 0;
-                    pominPuste();
-                }
-            }
-        }
-    }
-
-    void pominPuste() {
-        while (itRok != baza.lata.end()) {
-            if (itMiesiac == itRok->second->miesiace.end()) {
-                itRok++;
-                if (itRok != baza.lata.end()) itMiesiac = itRok->second->miesiace.begin();
-                continue;
-            }
-            if (itDzien == itMiesiac->second->dni.end()) {
-                itMiesiac++;
-                if (itMiesiac != itRok->second->miesiace.end()) itDzien = itMiesiac->second->dni.begin();
-                continue;
-            }
-            if (itCwiartka == itDzien->second->cwiartki.end()) {
-                itDzien++;
-                if (itDzien != itMiesiac->second->dni.end()) itCwiartka = itDzien->second->cwiartki.begin();
-                continue;
-            }
-            if (indexPomiar >= itCwiartka->second->pomiary.size()) {
-                itCwiartka++;
-                indexPomiar = 0;
-                continue;
-            }
-            break;
-        }
-    }
+    vector<shared_ptr<Pomiar>> dane; ///< Płaska lista pomiarów pobrana z bazy.
+    size_t index;                    ///< Aktualna pozycja iteratora.
 
 public:
-    Iterator(BazaDanych& db) : baza(db) {
-        ustawNaPoczatek();
+    /**
+     * @brief Konstruktor iteratora.
+     *
+     * Pobiera wszystkie dane z bazy do wektora i ustawia wskaźnik na początek.
+     * @param db Referencja do bazy danych.
+     */
+    Iterator(BazaDanych& db) {
+        dane = db.pobierzWszystkiePomiary();
+        index = 0;
     }
 
+    /**
+     * @brief Sprawdza, czy iterator dotarł do końca zbioru danych.
+     * @return true Jeśli nie ma więcej elementów.
+     * @return false Jeśli są dostępne kolejne elementy.
+     */
     bool czyKoniec() {
-        return itRok == baza.lata.end();
+        return index >= dane.size();
     }
 
-    void nastepny() {
-        if (czyKoniec()) return;
-        indexPomiar++;
-        pominPuste();
-    }
-
+    /**
+     * @brief Zwraca wskaźnik na obecny element (Pomiar).
+     * @return shared_ptr<Pomiar> Wskaźnik na pomiar lub nullptr, jeśli koniec.
+     */
     shared_ptr<Pomiar> obecny() {
         if (czyKoniec()) return nullptr;
-        return itCwiartka->second->pomiary[indexPomiar];
+        return dane[index];
     }
-<<<<<<< HEAD
+
+    /**
+     * @brief Przesuwa iterator o jedną pozycję do przodu.
+     */
+    void nastepny() {
+        index++;
+    }
+
+    /**
+     * @brief Resetuje iterator na początek zbioru.
+     */
+    void naPoczatek() {
+        index = 0;
+    }
 };
->>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)
-=======
-};
->>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)
-void wyczysc() {
-    lata.clear(); // Czyści całą strukturę drzewa 
-}
+
+#endif
