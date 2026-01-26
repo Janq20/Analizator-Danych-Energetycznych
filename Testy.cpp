@@ -6,6 +6,16 @@
 
 // --- CZESC 1: NARZEDZIA ---
 
+// 5. Test sumowania produkcji przez Analizator [cite: 19]
+TEST(AnalizatorTest, ObliczanieSumyProdukcji) {
+    BazaDanych db;
+    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 10:15", 0, 0, 0, 0, 500));
+    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 10:30", 0, 0, 0, 0, 300));
+    Analizator an(db);
+    float suma = an.obliczSume("2021-10-03 10:00", "2021-10-03 11:00", [](auto p){ return p->produkcja; });
+    EXPECT_FLOAT_EQ(suma, 800.0f);
+}
+
 // 6. Test średniej z uwzględnieniem przedziału czasowego [cite: 19]
 TEST(AnalizatorTest, ObliczanieSredniejWPrzedziale) {
     BazaDanych db;
