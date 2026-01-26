@@ -6,6 +6,58 @@
 
 // --- CZESC 1: NARZEDZIA ---
 
+// 1. Test sprawdzający czy baza danych jest początkowo pusta
+TEST(BazaDanychTest, InicjalizacjaJestPusta) {
+    BazaDanych db;
+    EXPECT_TRUE(db.lata.empty());
+}
+
+// 2. Test sprawdzający poprawne przypisanie ćwiartki (00:00 - 05:45 to cwiartka 0) [cite: 15]
+TEST(BazaDanychTest, WyznaczanieCwiartki) {
+    BazaDanych db;
+    EXPECT_EQ(db.wyznaczIndeksCwiartki("2021-10-03 01:15"), 0);
+    EXPECT_EQ(db.wyznaczIndeksCwiartki("2021-10-03 13:00"), 2);
+}
+
+// 3. Test sprawdzający blokowanie duplikatów [cite: 31]
+TEST(BazaDanychTest, BlokowanieDuplikatow) {
+    BazaDanych db;
+    auto p1 = make_shared<Pomiar>("2021-10-03 10:15", 100, 50, 20, 30, 150);
+    auto p2 = make_shared<Pomiar>("2021-10-03 10:15", 100, 50, 20, 30, 150);
+    db.dodajDane(2021, 10, 3, p1);
+    // Próba dodania tego samego czasu powinna rzucić wyjątek (implementowaliśmy to w drzewo.h)
+    EXPECT_THROW(db.dodajDane(2021, 10, 3, p2), std::runtime_error);
+}
+
+// 4. Test iteratora - czy widzi dodane elementy [cite: 27]
+TEST(IteratorTest, PrzechodzeniePoDanych) {
+    BazaDanych db;
+    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 10:15", 10, 0, 0, 0, 0));
+    Iterator it(db);
+    EXPECT_FALSE(it.czyKoniec());
+    EXPECT_NE(it.obecny(), nullptr);
+}
+
+// 5. Test sumowania produkcji przez Analizator [cite: 19]
+TEST(AnalizatorTest, ObliczanieSumyProdukcji) {
+    BazaDanych db;
+    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 10:15", 0, 0, 0, 0, 500));
+    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 10:30", 0, 0, 0, 0, 300));
+    Analizator an(db);
+    float suma = an.obliczSume("2021-10-03 10:00", "2021-10-03 11:00", [](auto p){ return p->produkcja; });
+    EXPECT_FLOAT_EQ(suma, 800.0f);
+}
+
+// 6. Test średniej z uwzględnieniem przedziału czasowego [cite: 19]
+TEST(AnalizatorTest, ObliczanieSredniejWPrzedziale) {
+    BazaDanych db;
+    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 08:00", 0, 0, 0, 0, 200));
+    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 20:00", 0, 0, 0, 0, 600)); // Poza zakresem testu
+    Analizator an(db);
+    float srednia = an.obliczSrednia("2021-10-03 07:00", "2021-10-03 09:00", [](auto p){ return p->produkcja; });
+    EXPECT_FLOAT_EQ(srednia, 200.0f);
+}
+
 TEST(NarzedziaTest, KonwersjaNaFloat_Poprawna) {
     EXPECT_FLOAT_EQ(Narzedzia::konwertujNaFloat("123.45"), 123.45f);
 }
