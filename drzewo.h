@@ -10,6 +10,7 @@
 
 using namespace std;
 
+// --- Struktura Drzewa ---
 class Cwiartka {
 public:
     vector<shared_ptr<Pomiar>> pomiary;
@@ -84,7 +85,55 @@ public:
         lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx)->dodajPomiar(p);
     }
 
+    // Metoda pomocnicza dla Iteratora: Sp³aszcza ca³e drzewo do wektora
+    vector<shared_ptr<Pomiar>> pobierzWszystkiePomiary() {
+        vector<shared_ptr<Pomiar>> wynik;
+        for (auto const& [r, objRok] : lata) {
+            for (auto const& [m, objMiesiac] : objRok->miesiace) {
+                for (auto const& [d, objDzien] : objMiesiac->dni) {
+                    for (auto const& [c, objCwiartka] : objDzien->cwiartki) {
+                        wynik.insert(wynik.end(), objCwiartka->pomiary.begin(), objCwiartka->pomiary.end());
+                    }
+                }
+            }
+        }
+        return wynik;
+    }
+
     void wypiszStrukture() {
+    }
+};
+
+// --- Nowoœæ: Klasa Iterator ---
+class Iterator {
+private:
+    vector<shared_ptr<Pomiar>> dane;
+    size_t index;
+
+public:
+    // Konstruktor: pobiera dane z bazy i ustawia siê na pocz¹tku
+    Iterator(BazaDanych& db) {
+        dane = db.pobierzWszystkiePomiary();
+        index = 0;
+    }
+    bool czyKoniec() {
+        return index >= dane.size();
+    }
+
+    // Zwraca wskaŸnik na obecny pomiar
+    shared_ptr<Pomiar> obecny() {
+        if (czyKoniec()) return nullptr;
+        return dane[index];
+    }
+
+    // Przesuwa iterator o jeden do przodu
+    void nastepny() {
+        index++;
+    }
+
+    // Resetuje iterator na pocz¹tek
+    void naPoczatek() {
+        index = 0;
     }
 };
 
