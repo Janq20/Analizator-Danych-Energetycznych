@@ -1,78 +1,35 @@
-#ifndef MENEDZER_PLIKOW_H
-#define MENEDZER_PLIKOW_H
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <memory>
-#include "Drzewo.h"
-#include "Narzedzia.h"
-#include "Pomiar.h"
-
-using namespace std;
-
-class MenedzerPlikow {
+class Logger {
 private:
-    Logger logger;
+    string plikLog;
+    string plikError;
+
+    // Pobiera czas systemowy do nazwy pliku [cite: 34]
+    string pobierzTimestamp() {
+        auto teraz = chrono::system_clock::now();
+        auto in_time_t = chrono::system_clock::to_time_t(teraz);
+        stringstream ss;
+        ss << put_time(localtime(&in_time_t), "%Y%m%d_%H%M%S");
+        return ss.str();
+    }
 
 public:
-    void wczytajPlik(const string& nazwaPliku, BazaDanych& db) {
-        ifstream plik(nazwaPliku);
+    Logger() {
+        string ts = pobierzTimestamp();
+        plikLog = "log_" + ts + ".txt";         // [cite: 32]
+        plikError = "log_error_" + ts + ".txt"; // [cite: 32]
+    }
 
-        if (!plik.is_open()) {
-            cout << "BLAD: Nie mozna otworzyc pliku: " << nazwaPliku << endl;
-            logger.logujBlad("Nieudane otwarcie pliku", nazwaPliku);
-            return;
+    void loguj(string tresc, bool czyBlad = false) {
+        ofstream fLog(plikLog, ios::app);
+        fLog << tresc << endl;
+        
+        if (czyBlad) {
+            ofstream fErr(plikError, ios::app);
+            fErr << tresc << endl; // Zapisz tylko błędy do osobnego pliku [cite: 33]
         }
-
-        string linia;
-        int licznikLinii = 0;
-        int poprawne = 0;
-        int bledne = 0;
-
-        cout << "Wczytywanie danych..." << endl;
-
-        while (getline(plik, linia)) {
-            licznikLinii++;
-            if (licznikLinii == 1) continue;
-            if (linia.empty()) continue;
-
-            try {
-                vector<string> dane = Narzedzia::rozdzielTekst(linia, ',');
-
-                if (dane.size() < 6) {
-                    throw runtime_error("Niekompletna linia");
-                }
-
-                string czas = dane[0];
-                float autoKonsumpcja = Narzedzia::konwertujNaFloat(dane[1]);
-                float eksport = Narzedzia::konwertujNaFloat(dane[2]);
-                float importEn = Narzedzia::konwertujNaFloat(dane[3]);
-                float pobor = Narzedzia::konwertujNaFloat(dane[4]);
-                float produkcja = Narzedzia::konwertujNaFloat(dane[5]);
-
-                DataCzas dt = Narzedzia::parsujDate(czas);
-
-                auto pomiar = make_shared<Pomiar>(czas, autoKonsumpcja, eksport, importEn, pobor, produkcja);
-                db.dodajDane(dt.rok, dt.miesiac, dt.dzien, pomiar);
-
-                poprawne++;
-
-            }
-            catch (...) {
-                bledne++;
-                logger.logujBlad("Blad parsowania linii", linia);
-            }
-        }
-
-        plik.close();
-
-        cout << "=== Raport wczytywania ===" << endl;
-        cout << "Linii ogolem: " << licznikLinii << endl;
-        cout << "Poprawne:     " << poprawne << endl;
-        cout << "Bledne:       " << bledne << endl;
     }
 };
-
-#endif
