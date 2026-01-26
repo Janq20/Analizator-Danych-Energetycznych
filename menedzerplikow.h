@@ -81,3 +81,11 @@ void wczytajPlik(const string& nazwaPliku, BazaDanych& db) {
     cout << "Bledne rekordy: " << bledne << endl;
     cout << "--------------------------------" << endl;
 }
+// Dodaj w klasie Logger
+string generujNazweZCzasem(string prefiks) {
+    auto teraz = time(nullptr);
+    auto t = *localtime(&teraz);
+    char buf[80];
+    strftime(buf, sizeof(buf), "%Y%m%d_%H%M%S", &t);
+    return prefiks + "_" + string(buf) + ".txt";
+}
