@@ -89,3 +89,8 @@ string generujNazweZCzasem(string prefiks) {
     strftime(buf, sizeof(buf), "%Y%m%d_%H%M%S", &t);
     return prefiks + "_" + string(buf) + ".txt";
 }
+
+void zapiszLogi(string msg, bool blad) {
+    ofstream f1(nazwaLogu, ios::app); f1 << msg << endl;
+    if(blad) { ofstream f2(nazwaBledu, ios::app); f2 << msg << endl; }
+}
