@@ -6,6 +6,15 @@
 
 // --- CZESC 1: NARZEDZIA ---
 
+// 4. Test iteratora - czy widzi dodane elementy [cite: 27]
+TEST(IteratorTest, PrzechodzeniePoDanych) {
+    BazaDanych db;
+    db.dodajDane(2021, 10, 3, make_shared<Pomiar>("2021-10-03 10:15", 10, 0, 0, 0, 0));
+    Iterator it(db);
+    EXPECT_FALSE(it.czyKoniec());
+    EXPECT_NE(it.obecny(), nullptr);
+}
+
 // 5. Test sumowania produkcji przez Analizator [cite: 19]
 TEST(AnalizatorTest, ObliczanieSumyProdukcji) {
     BazaDanych db;
