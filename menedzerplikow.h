@@ -33,3 +33,51 @@ public:
         }
     }
 };
+void wczytajPlik(const string& nazwaPliku, BazaDanych& db) {
+    ifstream plik(nazwaPliku);
+    if (!plik.is_open()) {
+        logger.loguj("BLAD: Nie mozna otworzyc pliku: " + nazwaPliku, true);
+        return;
+    }
+
+    string linia;
+    int sumaRekordow = 0;
+    int poprawne = 0;
+    int bledne = 0;
+
+    while (getline(plik, linia)) {
+        sumaRekordow++;
+        if (sumaRekordow == 1) continue; // Pominiecie naglowka [cite: 4]
+        if (linia.empty()) continue;     // Pominiecie pustych linii [cite: 31]
+
+        try {
+            vector<string> dane = Narzedzia::rozdzielTekst(linia, ',');
+            if (dane.size() < 6) throw runtime_error("Niekompletna linia");
+
+            string czas = dane[0];
+            float autok = Narzedzia::konwertujNaFloat(dane[1]);
+            float eksp = Narzedzia::konwertujNaFloat(dane[2]);
+            float imp = Narzedzia::konwertujNaFloat(dane[3]);
+            float pob = Narzedzia::konwertujNaFloat(dane[4]);
+            float prod = Narzedzia::konwertujNaFloat(dane[5]);
+
+            DataCzas dt = Narzedzia::parsujDate(czas);
+            auto pomiar = make_shared<Pomiar>(czas, autok, eksp, imp, pob, prod);
+            
+            db.dodajDane(dt.rok, dt.miesiac, dt.dzien, pomiar);
+            poprawne++;
+            logger.loguj("Poprawny rekord: " + linia);
+        }
+        catch (const exception& e) {
+            bledne++;
+            logger.loguj("BŁĄD (linia " + to_string(sumaRekordow) + "): " + linia, true);
+        }
+    }
+    plik.close();
+
+    // Podsumowanie na ekranie 
+    cout << "--- PODSUMOWANIE WCZYTYWANIA ---" << endl;
+    cout << "Poprawne rekordy: " << poprawne << endl;
+    cout << "Bledne rekordy: " << bledne << endl;
+    cout << "--------------------------------" << endl;
+}
