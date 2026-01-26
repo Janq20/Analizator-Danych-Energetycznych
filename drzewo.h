@@ -10,6 +10,7 @@
 
 using namespace std;
 
+// --- Struktura Drzewa ---
 class Cwiartka {
 public:
     vector<shared_ptr<Pomiar>> pomiary;
@@ -84,6 +85,21 @@ public:
         lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx)->dodajPomiar(p);
     }
 
+    // Metoda pomocnicza dla Iteratora: Spłaszcza całe drzewo do wektora
+    vector<shared_ptr<Pomiar>> pobierzWszystkiePomiary() {
+        vector<shared_ptr<Pomiar>> wynik;
+        for (auto const& [r, objRok] : lata) {
+            for (auto const& [m, objMiesiac] : objRok->miesiace) {
+                for (auto const& [d, objDzien] : objMiesiac->dni) {
+                    for (auto const& [c, objCwiartka] : objDzien->cwiartki) {
+                        wynik.insert(wynik.end(), objCwiartka->pomiary.begin(), objCwiartka->pomiary.end());
+                    }
+                }
+            }
+        }
+        return wynik;
+    }
+
     void wypiszStrukture() {
     }
 };
@@ -100,7 +116,7 @@ void dodajDane(int r, int m, int d, shared_ptr<Pomiar> p) {
     // --- LOGIKA ANTY-DUPLIKATOWA (zgodnie z wymogiem s. 2 pkt 31) ---
     for (const auto& istniejacy : cwiartka->pomiary) {
         if (istniejacy->czas == p->czas) {
-            // Rzucamy wyjątek, który zostanie zalogowany w MenedzerPlikow
+            // Rzucamy wyjÄ…tek, ktĂłry zostanie zalogowany w MenedzerPlikow
             throw runtime_error("Wykryto duplikat - pomijanie rekordu: " + p->czas); 
         }
     }
