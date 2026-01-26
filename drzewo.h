@@ -123,3 +123,83 @@ void dodajDane(int r, int m, int d, shared_ptr<Pomiar> p) {
 
     cwiartka->dodajPomiar(p);
 }
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)
+class Iterator {
+private:
+    BazaDanych& baza;
+    map<int, shared_ptr<Rok>>::iterator itRok;
+    map<int, shared_ptr<Miesiac>>::iterator itMiesiac;
+    map<int, shared_ptr<Dzien>>::iterator itDzien;
+    map<int, shared_ptr<Cwiartka>>::iterator itCwiartka;
+    size_t indexPomiar;
+
+    void ustawNaPoczatek() {
+        itRok = baza.lata.begin();
+        if (itRok != baza.lata.end()) {
+            itMiesiac = itRok->second->miesiace.begin();
+            if (itMiesiac != itRok->second->miesiace.end()) {
+                itDzien = itMiesiac->second->dni.begin();
+                if (itDzien != itMiesiac->second->dni.end()) {
+                    itCwiartka = itDzien->second->cwiartki.begin();
+                    indexPomiar = 0;
+                    pominPuste();
+                }
+            }
+        }
+    }
+
+    void pominPuste() {
+        while (itRok != baza.lata.end()) {
+            if (itMiesiac == itRok->second->miesiace.end()) {
+                itRok++;
+                if (itRok != baza.lata.end()) itMiesiac = itRok->second->miesiace.begin();
+                continue;
+            }
+            if (itDzien == itMiesiac->second->dni.end()) {
+                itMiesiac++;
+                if (itMiesiac != itRok->second->miesiace.end()) itDzien = itMiesiac->second->dni.begin();
+                continue;
+            }
+            if (itCwiartka == itDzien->second->cwiartki.end()) {
+                itDzien++;
+                if (itDzien != itMiesiac->second->dni.end()) itCwiartka = itDzien->second->cwiartki.begin();
+                continue;
+            }
+            if (indexPomiar >= itCwiartka->second->pomiary.size()) {
+                itCwiartka++;
+                indexPomiar = 0;
+                continue;
+            }
+            break;
+        }
+    }
+
+public:
+    Iterator(BazaDanych& db) : baza(db) {
+        ustawNaPoczatek();
+    }
+
+    bool czyKoniec() {
+        return itRok == baza.lata.end();
+    }
+
+    void nastepny() {
+        if (czyKoniec()) return;
+        indexPomiar++;
+        pominPuste();
+    }
+
+    shared_ptr<Pomiar> obecny() {
+        if (czyKoniec()) return nullptr;
+        return itCwiartka->second->pomiary[indexPomiar];
+    }
+<<<<<<< HEAD
+};
+>>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)
+=======
+};
+>>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)

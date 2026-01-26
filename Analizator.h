@@ -71,7 +71,7 @@ public:
         auto getPob = [](auto p) { return p->pobor; };
         auto getProd = [](auto p) { return p->produkcja; };
 
-        // Tabela wyników
+        // Tabela wynikï¿½w
         cout << "Kategoria       | Suma [W]       | Srednia [W]" << endl;
         cout << "----------------------------------------------" << endl;
         cout << "Autokonsumpcja  | " << obliczSume(getAuto) << "\t | " << obliczSrednia(getAuto) << endl;
@@ -84,3 +84,23 @@ public:
 };
 
 #endif
+void szukajZWarunkiem(string nazwa, float szukana, float tolerancja, string start, string koniec, function<float(shared_ptr<Pomiar>)> selector) {
+    Iterator it(db);
+    cout << "\n[FILTR] Szukanie: " << nazwa << " | Cel: " << szukana << " (+/- " << tolerancja << ")" << endl;
+    cout << "[ZAKRES] " << start << " - " << koniec << endl;
+
+    bool znaleziono = false;
+    while (!it.czyKoniec()) {
+        auto p = it.obecny();
+        // Sprawdzenie czasu i wartoÅ›ci 
+        if (p && p->czas >= start && p->czas <= koniec) {
+            float wartosc = selector(p);
+            if (abs(wartosc - szukana) <= tolerancja) {
+                cout << "  MATCH -> Data: " << p->czas << " | Wartosc: " << wartosc << " W" << endl;
+                znaleziono = true;
+            }
+        }
+        it.nastepny();
+    }
+    if (!znaleziono) cout << "  Brak rekordow spelniajacych kryteria." << endl;
+}
