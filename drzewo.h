@@ -124,7 +124,10 @@ void dodajDane(int r, int m, int d, shared_ptr<Pomiar> p) {
     cwiartka->dodajPomiar(p);
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)
 class Iterator {
 private:
     BazaDanych& baza;
@@ -194,5 +197,9 @@ public:
         if (czyKoniec()) return nullptr;
         return itCwiartka->second->pomiary[indexPomiar];
     }
+<<<<<<< HEAD
+};
+>>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)
+=======
 };
 >>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)
