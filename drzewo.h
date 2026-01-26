@@ -89,3 +89,21 @@ public:
 };
 
 #endif
+void dodajDane(int r, int m, int d, shared_ptr<Pomiar> p) {
+    if (lata.find(r) == lata.end()) {
+        lata[r] = make_shared<Rok>();
+    }
+
+    int idx = wyznaczIndeksCwiartki(p->czas);
+    auto cwiartka = lata[r]->wezMiesiac(m)->wezDzien(d)->wezCwiartke(idx);
+
+    // --- LOGIKA ANTY-DUPLIKATOWA (zgodnie z wymogiem s. 2 pkt 31) ---
+    for (const auto& istniejacy : cwiartka->pomiary) {
+        if (istniejacy->czas == p->czas) {
+            // Rzucamy wyjątek, który zostanie zalogowany w MenedzerPlikow
+            throw runtime_error("Wykryto duplikat - pomijanie rekordu: " + p->czas); 
+        }
+    }
+
+    cwiartka->dodajPomiar(p);
+}
