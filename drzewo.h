@@ -203,3 +203,6 @@ public:
 =======
 };
 >>>>>>> 9bbcf7b (Implementacja poprawnego iteratora przechodzącego po węzłach drzewa)
+void wyczysc() {
+    lata.clear(); // Czyści całą strukturę drzewa 
+}
